@@ -42,8 +42,8 @@ prometheus_rebuild:           false
 prometheus_port: 9196
 prometheus_node_exporter_port: 9197
 prometheus_alertmanager_port: 9198
-prometheus_alertmanager_smtp_host: 127.0.0.1:25
-prometheus_alertmanager_smtp_sender: bosiidelaprimetime@adobe.com
+prometheus_alertmanager_smtp_host: "127.0.0.1:25"
+prometheus_alertmanager_smtp_sender: "bosiidelaprimetime@adobe.com"
 prometheus_alertmanager_url: "http://localhost:9198/"
 
 prometheus_rule_files:

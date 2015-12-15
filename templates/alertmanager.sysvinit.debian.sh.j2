@@ -33,6 +33,8 @@ GOSU=/usr/local/bin/gosu
 
 DAEMON_OPTS="-config.file=$CONFIG  -silences.file={{ prometheus_alertmanager_db_path }}/silences.json "
 DAEMON_OPTS="$DAEMON_OPTS -web.listen-address=:{{ prometheus_alertmanager_port }}"
+DAEMON_OPTS="$DAEMON_OPTS -notification.smtp.smarthost={{ prometheus_alertmanager_smtp_host }}"
+DAEMON_OPTS="$DAEMON_OPTS -notification.smtp.sender={{ prometheus_alertmanager_smtp_sender }}"
 {% if prometheus_alertmanager_opts is defined %}
 DAEMON_OPTS="$DAEMON_OPTS {{ prometheus_alertmanager_opts }}"
 {% endif %}
