@@ -26,7 +26,7 @@ PID="{{ prometheus_pid_path }}/$NAME.pid"
 LOG="{{ prometheus_log_path }}/$NAME.log"
 GOSU=/usr/local/bin/gosu
 
-DAEMON_OPTS="$DAEMON_OPTS -web.listen-address=:{{ prometheus_node_exporter }}"
+DAEMON_OPTS="$DAEMON_OPTS -web.listen-address=:{{ prometheus_node_exporter_port }}"
 {% if prometheus_node_exporter_opts is defined %}
 DAEMON_OPTS='{{ prometheus_node_exporter_opts }}'
 {% else %}
