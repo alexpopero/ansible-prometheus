@@ -51,6 +51,8 @@ prometheus_rule_files:
     src:  test/basic.rules
     dest: basic.rules
 
+prometheus_alertmanager_conf: test/alertmanager.conf.j2
+
 #
 # derived variables; internal use only.
 #
