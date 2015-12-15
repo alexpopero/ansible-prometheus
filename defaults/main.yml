@@ -39,10 +39,10 @@ prometheus_clean_tarball:     true
 # rebuild each time?  (only applied to `git` version)
 prometheus_rebuild:           false
 
-prometheus_port:             	9090
-prometheus_node_exporter_port:  9100
-prometheus_alertmanager_port:	9093
-prometheus_pushgateway_port:	9091
+prometheus_port:             	9196
+prometheus_node_exporter_port:  9197
+prometheus_alertmanager_port:	9198
+prometheus_pushgateway_port:	9199
 
 #
 # derived variables; internal use only.
