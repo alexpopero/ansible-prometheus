@@ -3,41 +3,41 @@
 #
 
 - name: restart prometheus
-  shell: pkill -f prometheus; service prometheus start
+  shell: systemctl daemon-reload; service prometheus stop; service prometheus start
   when: prometheus_use_service|bool
 
 - name: reload prometheus
-  shell: pkill -f prometheus; service prometheus start
+  shell: systemctl daemon-reload; service prometheus stop; service prometheus start
   when: prometheus_use_service|bool
 
 - name: stop prometheus
-  shell: pkill -f prometheus
+  shell: service prometheus stop
   when: prometheus_use_service|bool
 
 
 
 - name: restart node_exporter
-  shell: pkill -f node_exporter; service node_exporter start
+  shell: systemctl daemon-reload; service node_exporter stop; service node_exporter start
   when: prometheus_use_service|bool
 
 - name: reload node_exporter
-  shell: pkill -f node_exporter; service node_exporter start
+  shell: systemctl daemon-reload; service node_exporter stop; service node_exporter start
   when: prometheus_use_service|bool
 
 - name: stop node_exporter
-  shell: pkill -f node_exporter
+  shell: service node_exporter stop
   when: prometheus_use_service|bool
 
 
 
 - name: restart alertmanager
-  shell: pkill -f alertmanager; service alertmanager start
+  shell: systemctl daemon-reload; service alertmanager stop; service alertmanager start
   when: prometheus_use_service|bool
 
 - name: reload alertmanager
-  shell: pkill -f alertmanager; service alertmanager start
+  shell: systemctl daemon-reload; service alertmanager stop; service alertmanager start
   when: prometheus_use_service|bool
 
 - name: stop alertmanager
-  shell: pkill -f alertmanager
+  shell: service alertmanager stop;
   when: prometheus_use_service|bool
