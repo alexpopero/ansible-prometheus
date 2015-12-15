@@ -27,7 +27,13 @@ scrape_configs:
     scrape_interval: 5s
     scrape_timeout: 10s
     target_groups:
-      - targets: ['localhost:9090']
+      - targets: ['localhost:{{ prometheus_port }}']
+
+  - job_name: 'exporters'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+    target_groups:
+      - targets: [{% for node in groups['prometheus-node-exporters'] %}'{{ node }}:{{ prometheus_node_exporter_port }}'{% if not loop.last %},{% endif %}{% endfor %}]
 
   - job_name: "node"
     file_sd_configs:
