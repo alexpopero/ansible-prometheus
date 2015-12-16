@@ -41,3 +41,16 @@
 - name: stop alertmanager
   shell: service alertmanager stop;
   when: prometheus_use_service|bool
+
+- name: restart pushgateway
+  shell: systemctl daemon-reload; service pushgateway stop; service pushgateway start
+  when: prometheus_use_service|bool
+
+- name: reload pushgateway
+  shell: systemctl daemon-reload; service pushgateway stop; service pushgateway start
+  when: prometheus_use_service|bool
+
+- name: stop pushgateway
+  shell: service pushgateway stop;
+  when: prometheus_use_service|bool
+

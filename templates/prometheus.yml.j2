@@ -35,6 +35,12 @@ scrape_configs:
     target_groups:
       - targets: [{% for node in groups['prometheus-node-exporters'] %}'{{ node }}:{{ prometheus_node_exporter_port }}'{% if not loop.last %},{% endif %}{% endfor %}]
 
+  - job_name: 'gateways'
+    scrape_interval: 5s
+    scrape_timeout: 10s
+    target_groups:
+      - targets: [{% for node in groups['prometheus-gateways'] %}'{{ node }}:{{ prometheus_gateway_port }}'{% if not loop.last %},{% endif %}{% endfor %}]
+
   - job_name: "node"
     file_sd_configs:
       - names:

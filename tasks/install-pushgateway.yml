@@ -1,0 +1,77 @@
+---
+# file: tasks/install-node-exporter.yml
+#
+# Install Prometheus pushgateway.
+#
+# @see http://prometheus.io/docs/introduction/getting_started/
+#
+
+- name: set internal variables for convenience
+  set_fact:
+    prometheus_pushgateway_tarball_url: "https://github.com/prometheus/pushgateway/releases/download/{{ prometheus_pushgateway_version }}/pushgateway-{{ prometheus_pushgateway_version }}.linux-amd64.tar.gz"
+    prometheus_pushgateway_untar_path: "{{ prometheus_install_path }}"
+  when: prometheus_pushgateway_version != "git" and ansible_userspace_bits == "64"
+
+- name: set internal variables for convenience
+  set_fact:
+    prometheus_pushgateway_tarball_url: "https://github.com/prometheus/pushgateway/releases/download/{{ prometheus_pushgateway_version }}/pushgateway-{{ prometheus_pushgateway_version }}.linux-386.tar.gz"
+    prometheus_pushgateway_untar_path: "{{ prometheus_install_path }}"
+  when: prometheus_pushgateway_version != "git" and ansible_userspace_bits == "32"
+
+- name: set internal variables for convenience
+  set_fact:
+    prometheus_pushgateway_tarball_url: "https://github.com/prometheus/pushgateway/archive/master.tar.gz"
+    prometheus_pushgateway_untar_path: "{{ prometheus_download_path }}"
+  when: prometheus_pushgateway_version == "git"
+
+
+
+- name: delete the pushgateway build directory, if necessary
+  file: path="{{ prometheus_pushgateway_untar_path }}/pushgateway-master" state=absent
+  when: prometheus_pushgateway_version == "git" and prometheus_rebuild
+
+- name: download pushgateway tarball
+  get_url: url="{{ prometheus_pushgateway_tarball_url }}" dest="{{ prometheus_download_path }}/pushgateway.tar.gz" force=yes
+
+- name: untar pushgateway tarball
+  unarchive:
+    src: "{{ prometheus_download_path }}/pushgateway.tar.gz"
+    dest: "{{ prometheus_pushgateway_untar_path }}"
+    copy: no
+
+- name: build pushgateway source code
+  command: make
+  args:
+    chdir: "{{ prometheus_pushgateway_untar_path }}/pushgateway-master"
+    creates: pushgateway
+  when: prometheus_pushgateway_version == "git"
+
+- name: copy the built pushgateway to the install path
+  command: "cp {{ prometheus_pushgateway_untar_path }}/pushgateway-master/pushgateway {{ prometheus_install_path }}"
+  args:
+    creates: "{{ prometheus_install_path }}/pushgateway"
+  when: prometheus_node_exporter_version == "git"
+
+- name: set permissions, owner and group
+  file: path={{ prometheus_install_path }}/pushgateway owner={{ prometheus_user }} group={{ prometheus_group }} mode="go-w"
+
+- name: mkdir for data
+  file:
+    path: "{{ prometheus_db_path }}"
+    state: directory
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: "u=rwx,g=rx,o="
+
+- name: set pushgateway variables
+  copy: src="../files/etc-default-pushgateway"  dest=/etc/default/pushgateway
+
+- name: copy INIT script to server
+  template: src="../templates/pushgateway.sysvinit.{{ ansible_os_family|lower }}.sh.j2"  dest="/etc/init.d/pushgateway"  mode="a+x"
+
+- name: set INIT status
+  service: name=pushgateway enabled=yes
+
+- name: set INIT status and start
+  service: name=pushgateway state=started
+  when: prometheus_use_service|bool

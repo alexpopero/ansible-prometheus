@@ -17,6 +17,7 @@ prometheus_version:                 0.16.1
 prometheus_node_exporter_version:   0.11.0
 prometheus_alertmanager_version:    0.0.4
 prometheus_consul_exporter_version: 0.2.0
+prometheus_pushgateway_version: 0.2.0
 
 gosu_version:  1.4
 
@@ -42,6 +43,7 @@ prometheus_rebuild:           false
 prometheus_port: 9196
 prometheus_node_exporter_port: 9197
 prometheus_alertmanager_port: 9198
+prometheus_pushgateway_port: 9199
 prometheus_alertmanager_smtp_host: "127.0.0.1:25"
 prometheus_alertmanager_smtp_sender: "bosiidelaprimetime@adobe.com"
 prometheus_alertmanager_url: "http://localhost:9198/"
