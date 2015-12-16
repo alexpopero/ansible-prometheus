@@ -1,20 +1,22 @@
-#!/bin/sh
+#!/bin/bash
 
 ### BEGIN INIT INFO
-# Provides:          pushgateway
-# Required-Start:    $remote_fs
-# Required-Stop:     $remote_fs
-# Should-Start:      $all
-# Should-Stop:       $all
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
+# processname:       pushgateway
 # Short-Description: Prometheus pushgateway.
 # Description:       Prometheus pushgateway.
+
+#
+# chkconfig: 2345 80 80
+# pidfile: {{ prometheus_pid_path }}/pushgateway.pid
+#
+#
 ### END INIT INFO
 
-set -e
+#set -e
 
-. /lib/lsb/init-functions
+# Source function library.
+. /etc/init.d/functions
+
 
 NAME=pushgateway
 DESC="Prometheus pushgateway"
@@ -32,11 +34,14 @@ DAEMON_OPTS='{{ prometheus_pushgateway_opts }}'
 DAEMON_OPTS=
 {% endif %}
 
+RETVAL=0
+
+
 
 # Check if DAEMON binary exist
 [ -f $DAEMON ] || exit 0
 
-[ -f "/etc/default/$NAME" ] && . /etc/default/$NAME
+[ -f "/etc/default/$NAME" ]  &&  . /etc/default/$NAME
 
 
 service_not_configured () {
@@ -48,7 +53,7 @@ service_not_configured () {
   exit 0
 }
 
-service_checks () {
+service_checks() {
   # Check if START variable is set to "yes", if not we exit.
   if [ "$START" != "yes" ]; then
     service_not_configured $1
@@ -68,53 +73,41 @@ service_checks () {
   fi
 }
 
-start () {
+start() {
   service_checks $1
   $GOSU $USER   $DAEMON $DAEMON_OPTS  > $LOG 2>&1  &
   RETVAL=$?
   echo $! > $PID
-
-  if [ $RETVAL ]; then
-    log_end_msg 0
-  else
-    log_end_msg 1
-  fi
 }
 
-stop () {
-  if start-stop-daemon --retry TERM/5/KILL/5 --oknodo --stop --quiet --pidfile $PID 2>&1 1>$LOG
-  then
-    log_end_msg 0
-    rm $PID
-  else
-    log_end_msg 1
-  fi
+stop() {
+  killproc -p $PID -b $DAEMON  $NAME
+  RETVAL=$?
 }
 
+reload() {
+  killproc -p $PID -b $DAEMON  $NAME -HUP
+  RETVAL=$?
+}
 
 case "$1" in
   start)
-    log_daemon_msg "Starting $DESC -" "$NAME"
+    echo -n $"Starting $DESC -" "$NAME" $'\n'
     start
     ;;
 
   stop)
-    log_daemon_msg "Stopping $DESC -" "$NAME"
+    echo -n $"Stopping $DESC -" "$NAME" $'\n'
     stop
     ;;
 
   reload)
-    log_daemon_msg "Reloading $DESC configuration -" "$NAME"
-    if start-stop-daemon --stop --signal HUP --quiet --oknodo --pidfile $PID --startas /bin/bash -- -c "exec $DAEMON $DAEMON_OPTS > $LOG 2>&1"
-    then
-      log_end_msg 0
-    else
-      log_end_msg 1
-	  fi
+    echo -n $"Reloading $DESC configuration -" "$NAME" $'\n'
+    reload
     ;;
 
   restart|force-reload)
-    log_daemon_msg "Restarting $DESC -" "$NAME"
+    echo -n $"Restarting $DESC -" "$NAME" $'\n'
     stop
     start
     ;;
@@ -124,12 +117,12 @@ case "$1" in
     ;;
 
   status)
-    status_of_proc -p $PID $DAEMON $NAME
+    status -p $PID $DAEMON
     ;;
 
   *)
-    log_action_msg "Usage: /etc/init.d/$NAME {start|stop|reload|restart|force-reload|syntax|status}"
+    echo -n $"Usage: /etc/init.d/$NAME {start|stop|reload|restart|force-reload|syntax|status}" $'\n'
     ;;
 esac
 
-exit 0
+exit $RETVAL
