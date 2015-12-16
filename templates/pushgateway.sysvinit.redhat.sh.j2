@@ -27,12 +27,12 @@ PID="{{ prometheus_pid_path }}/$NAME.pid"
 LOG="{{ prometheus_log_path }}/$NAME.log"
 GOSU=/usr/local/bin/gosu
 
-DAEMON_OPTS="$DAEMON_OPTS -web.listen-address=:{{ prometheus_pushgateway_port }}"
 {% if prometheus_pushgateway_opts is defined %}
 DAEMON_OPTS='{{ prometheus_pushgateway_opts }}'
 {% else %}
 DAEMON_OPTS=
 {% endif %}
+DAEMON_OPTS="$DAEMON_OPTS -web.listen-address=:{{ prometheus_pushgateway_port }}"
 
 RETVAL=0
 
